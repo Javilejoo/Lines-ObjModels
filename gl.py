@@ -1,6 +1,5 @@
 import struct # to convert data to bytes
 from collections import namedtuple
-import numpy as np
 from obj import Obj
 
 V2 = namedtuple('Point2', ['x', 'y']) # 2D point
@@ -67,17 +66,29 @@ class Renderer(object):
         self.glLine(v0, v1, clr or self.currColor)
         self.glLine(v1, v2, clr or self.currColor)
         self.glLine(v2, v0, clr or self.currColor)
+    
+    def glModelMatrixNoNP(self, translate = (0,0,0), scale=(1,1,1)):
+        #matriz de tranlacion
+        translation = [[1,0,0,translate[0]],
+                       [0,1,0,translate[1]],
+                       [0,0,1,translate[2]],
+                       [0,0,0,1]]
+        #matriz de scale
+        scaleMat = [[scale[0], 0,0,0],
+                    [0,scale[2],0,0],
+                    [0,0,scale[2],0],
+                    [0,0,0,1]]
+        
+        #Logica para multiplicacion de las 2 matrices
+        result = [[0, 0, 0, 0] for _ in range(4)]
 
-    def glModelMatrix(self, translate = (0,0,0), scale=(1,1,1)):
-        translation = np.matrix([[1,0,0,translate[0]],
-                               [0,1,0,translate[1]],
-                               [0,0,1,translate[2]],
-                               [0,0,0,1]])
-        scaleMat = np.matrix([[scale[0],0,0,0],
-                           [0,scale[1],0,0],
-                           [0,0,scale[2],0],
-                           [0,0,0,1]])
-        return translation * scaleMat
+        for i in range(4):
+            for j in range(4):
+                for k in range(4):
+                    result[i][j] += translation[i][k] * scaleMat[k][j]
+
+        return result
+
 
     def glAddVertices(self, vertices):
         for vertex in vertices:
@@ -207,7 +218,7 @@ class Renderer(object):
         transformedVerts = []
 
         for model in self.objects:
-            mMat = self.glModelMatrix(model.translate, model.scale)
+            mMat2 = self.glModelMatrixNoNP(model.translate, model.scale)
 
             for face in model.faces:
                 vertCount = len(face)
@@ -219,11 +230,11 @@ class Renderer(object):
                     v3 = model.vertices [face[3][0] - 1]
 
                 if self.vertexShader:
-                    v0 = self.vertexShader(v0, modelMatrix = mMat)
-                    v1 = self.vertexShader(v1, modelMatrix = mMat)
-                    v2 = self.vertexShader(v2, modelMatrix = mMat)
+                    v0 = self.vertexShader(v0,modelMatrix = mMat2)
+                    v1 = self.vertexShader(v1,modelMatrix = mMat2)
+                    v2 = self.vertexShader(v2,modelMatrix = mMat2)
                     if vertCount == 4:
-                        v3 = self.vertexShader(v3, modelMatrix = mMat)
+                        v3 = self.vertexShader(v3, modelMatrix = mMat2)
                 
                 transformedVerts.append(v0)
                 transformedVerts.append(v1)

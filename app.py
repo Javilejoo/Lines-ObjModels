@@ -11,7 +11,7 @@ rend = Renderer(width, height)
 rend.vertexShader = shaders.vertexShader # type: ignore
 rend.fragmentShader = shaders.fragmentShader # type: ignore
 
-rend.glLoadModel("Stone.obj", translate = (width/2, height/2, 0), scale = (50,50,50))
+rend.glLoadModel("Stone.obj", translate = (width/2, height/6, 0), scale = (85,85,85))
 
 
 rend.glRender()

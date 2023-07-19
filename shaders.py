@@ -1,20 +1,24 @@
-def vertexShader(vertex, **kwargs):
-    modelMatrix = kwargs['modelMatrix']
+def vertexShader(vertex, modelMatrix):
+    vt = [
+        vertex[0],
+        vertex[1],
+        vertex[2],
+        1
+    ]
 
-    vt = [vertex[0], 
-                         vertex[1],
-                         vertex[2],
-                        1]
+    #multiplicar vt con el modelo matriz 4x4
+    vt_result = [0, 0, 0, 0]
+    for i in range(4):
+        for j in range(4):
+            vt_result[i] += modelMatrix[i][j] * vt[j]
 
-    vt = modelMatrix @ vt
+    vt_result = [
+        vt_result[0] / vt_result[3],
+        vt_result[1] / vt_result[3],
+        vt_result[2] / vt_result[3]
+    ]
 
-    vt = vt.tolist()[0]
-
-    vt = [vt[0]/vt[3],
-          vt[1]/vt[3],
-          vt[2]/vt[3]]
-    # in the future there will be some work here
-    return vt
+    return vt_result
 
 def fragmentShader(**kwargs):
     color = (0.5, 0.5, 0.5)
