@@ -128,6 +128,7 @@ class Renderer(object):
         if(x < self.width and x >= 0 and y < self.height and y >= 0): # check if the point is inside the frame
             self.pixels[int(x)][int(y)] = clr or self.currColor
 
+
     def glLine(self, v0, v1, clr = None):
         '''        
         # bresenham's line algorithm
@@ -183,6 +184,26 @@ class Renderer(object):
 
             if offset >= limit:
                 y += 1 if y0 < y1 else -1; limit += 1
+
+    def P1 (self,puntos,clr = None):
+        for punto in puntos:
+            x, y = punto
+            self.glPoint(x, y , clr or self.currColor) 
+    
+    def poligonos (self,puntos,clr = None):
+        num_puntos = len(puntos)
+        # Dibujar los puntos del polígono
+        for punto in puntos:
+            x, y = punto
+            self.glPoint(x, y)
+            # Dibujar líneas para conectar los puntos del polígono
+            for i in range(num_puntos):
+                v0 = puntos[i]
+                v1 = puntos[(i + 1) % num_puntos]  # Obtenemos el siguiente punto en forma circular
+                self.glLine(v0, v1)
+
+
+
         
     # generating the file, framebuffer, image    
     def glFinish(self, filename):
