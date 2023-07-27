@@ -21,5 +21,5 @@ def vertexShader(vertex, modelMatrix):
     return vt_result
 
 def fragmentShader(**kwargs):
-    color = (0.5, 0.5, 0.5)
+    color = (0, 0,0)
     return color

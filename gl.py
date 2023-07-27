@@ -50,7 +50,7 @@ class Renderer(object):
         self.glClearColor(0, 0, 0)
         self.glClear()
 
-        self.glColor(1, 1, 1)
+        self.glColor(0, 0, 0)
 
         self.objects = []
 
@@ -185,10 +185,7 @@ class Renderer(object):
             if offset >= limit:
                 y += 1 if y0 < y1 else -1; limit += 1
 
-    def P1 (self,puntos,clr = None):
-        for punto in puntos:
-            x, y = punto
-            self.glPoint(x, y , clr or self.currColor) 
+
     
     def poligonos (self,puntos,clr = None):
         num_puntos = len(puntos)
@@ -201,9 +198,66 @@ class Renderer(object):
                 v0 = puntos[i]
                 v1 = puntos[(i + 1) % num_puntos]  # Obtenemos el siguiente punto en forma circular
                 self.glLine(v0, v1)
+        
+    def renderLine(self, x0, y0, x1, y1, clr=None):
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        steep = dy > dx
 
+        if steep:
+            x0, y0 = y0, x0
+            x1, y1 = y1, x1
 
+        if x0 > x1:
+            x0, x1 = x1, x0
+            y0, y1 = y1, y0
 
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+
+        offset = 0
+        threshold = dx
+
+        y = y0
+        for x in range(x0, x1 + 1):
+            if steep:
+                self.glPoint(y, x, clr or self.currColor)
+            else:
+                self.glPoint(x, y, clr or self.currColor)
+
+            offset += dy * 2
+
+            if offset >= threshold:
+                y += 1 if y0 < y1 else -1
+                threshold += dx * 2
+
+    def fillPolygon(self, points, clr=None):
+        if len(points) < 3:
+            print("A polygon must have at least 3 points.")
+            return
+        # Obtenemos las coordenadas min y maxen el eje y para limitar el escaneo de lineas.
+        minY = max(0, min(y for _, y in points))
+        maxY = min(self.height - 1, max(y for _, y in points))
+
+        # Escaneo de lineas en el rango de coordenadas y.
+        for y in range(minY, maxY + 1):
+            intersectX = []
+
+            for i in range(len(points)):
+                x0, y0 = points[i]
+                x1, y1 = points[(i + 1) % len(points)]
+
+                if (y0 <= y < y1) or (y1 <= y < y0):
+                    intersectX_val = x0 + (y - y0) * (x1 - x0) // (y1 - y0)
+                    intersectX.append(intersectX_val)
+            
+            intersectX.sort()
+
+            for i in range(0, len(intersectX), 2):
+                x0 = intersectX[i]
+                x1 = intersectX[i + 1] if i + 1 < len(intersectX) else x0
+                self.renderLine(x0, y, x1, y, clr)
+   
         
     # generating the file, framebuffer, image    
     def glFinish(self, filename):
