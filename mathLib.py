@@ -121,3 +121,13 @@ def division_vector_escalar(vector, escalar):
         resultado.append(vector[i] / escalar)
     
     return resultado
+
+def dot_product(vec1, vec2):
+    if len(vec1) != len(vec2):
+        raise ValueError("Vector dimensions do not match")
+    
+    result = 0
+    for i in range(len(vec1)):
+        result += vec1[i] * vec2[i]
+    
+    return result

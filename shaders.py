@@ -1,5 +1,6 @@
 import random
 from mathLib import *
+import numpy as np
 
 def vertexShader(vertex, **kwargs):
     
@@ -44,3 +45,105 @@ def fragmentShader(**kwargs):
 
 
     return color
+
+def flatShader(**kwargs):
+    texCoords = kwargs["texCoords"]
+    texture = kwargs["texture"]
+    dLight = kwargs["dLight"]
+    normal = kwargs["triangleNormal"]
+
+    b = 1.0
+    g = 1.0
+    r = 1.0
+
+    color = [1,1,1]
+
+    if texture != None:
+        texureColor = texture.getColor(texCoords[0], texCoords[1])
+        b *= texureColor[2]
+        g *= texureColor[1]
+        r *= texureColor[0]
+    
+    
+    dLight = np.array(dLight)
+    intensity = np.dot(normal, -dLight)
+
+   
+    b *= intensity
+    g *= intensity
+    r *= intensity
+    
+ 
+
+    if intensity > 0:
+        return r,g,b
+    else:
+        return [0,0,0]
+    
+def shaderNuevo(**kwargs):
+    
+    texCoords = kwargs["texCoords"]
+    texture = kwargs["texture"]
+    dLight = kwargs["dLight"]
+    normal = kwargs["triangleNormal"]
+
+    b = 1.0
+    g = 1.0
+    r = 1.0
+
+    # Obtener las coordenadas de textura
+    u, v = texCoords
+
+    # Modificar colores basados en las coordenadas de textura
+    r *= u
+    g *= v
+    b *= (u + v) / 2
+
+    # Calcular intensidad de la luz
+    dLight = np.array(dLight)
+    intensity = np.dot(normal, -dLight)
+
+    # Aplicar intensidad de luz a los colores
+    r *= intensity
+    g *= intensity
+    b *= intensity
+
+    if intensity > 0:
+        return r, g, b
+    else:
+        return [0, 0, 0]
+    
+def shaderNuevos(**kwargs):
+    
+    texCoords = kwargs["texCoords"]
+    texture = kwargs["texture"]
+    dLight = kwargs["dLight"]
+    normal = kwargs["triangleNormal"]
+
+    b = 1.0
+    g = 1.0
+    r = 1.0
+
+    # Obtener las coordenadas de textura
+    u, v = texCoords
+
+    # Modificar colores basados en las coordenadas de textura
+    r *= u
+    g *= v
+    b *= (u + v) / 2
+
+    # Calcular intensidad de la luz
+    dLight = dLight
+    intensity = dot_product(normal, [-d for d in dLight])  # Multiplicar por -1 para invertir la dirección de la luz
+
+    # Aplicar intensidad de luz a los colores
+    r *= intensity
+    g *= intensity
+    b *= intensity
+
+    if intensity > 0:
+        return r, g, b
+    else:
+        return [0, 0, 0]
+
+
