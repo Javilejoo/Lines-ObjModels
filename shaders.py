@@ -1,25 +1,46 @@
-def vertexShader(vertex, modelMatrix):
-    vt = [
-        vertex[0],
-        vertex[1],
-        vertex[2],
-        1
-    ]
+import random
+from mathLib import *
 
-    #multiplicar vt con el modelo matriz 4x4
-    vt_result = [0, 0, 0, 0]
-    for i in range(4):
-        for j in range(4):
-            vt_result[i] += modelMatrix[i][j] * vt[j]
+def vertexShader(vertex, **kwargs):
+    
+    # El Vertex Shader se lleva a cabo por cada v�rtice
 
-    vt_result = [
-        vt_result[0] / vt_result[3],
-        vt_result[1] / vt_result[3],
-        vt_result[2] / vt_result[3]
-    ]
+    modelMatrix = kwargs["modelMatrix"]
+    viewMatrix = kwargs["viewMatrix"]
+    projectionMatrix = kwargs["projectionMatrix"]
+    vpMatrix = kwargs["vpMatrix"]
 
-    return vt_result
+    vt = [vertex[0],
+          vertex[1],
+          vertex[2],
+          1]
+    # Se aplica la secuencia de transformaciones: 
+    #vt = vpMatrix * projectionMatrix * viewMatrix * modelMatrix @ vt
+    temp = multiplicar_matrices(vpMatrix, projectionMatrix)
+    temp = multiplicar_matrices(temp, viewMatrix)
+    temp = multiplicar_matrices(temp, modelMatrix)
+    #Vector transformacion al vertices
+    vt = multiplicar_matriz_vector(temp, vt)
+    #vt = vt.tolist()[0]
+
+    vt = [vt[0]/vt[3],
+          vt[1]/vt[3],
+          vt[2]/vt[3]]
+
+    return vt
 
 def fragmentShader(**kwargs):
-    color = (0, 0,0)
+
+    # El Fragment Shader se lleva a cabo por cada pixel
+    # que se renderizar� en la pantalla.
+
+    texCoords = kwargs["texCoords"]
+    texture = kwargs["texture"]
+
+    if texture != None:
+        color = texture.getColor(texCoords[0], texCoords[1])
+    else:
+        color = (1,1,1)
+
+
     return color
