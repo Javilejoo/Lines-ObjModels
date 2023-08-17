@@ -11,12 +11,12 @@ rend = Renderer(width, height)
 
 # Le damos los shaders que se utilizarán
 rend.vertexShader = shaders.vertexShader
-rend.fragmentShader = shaders.pixelationShader
+rend.fragmentShader = shaders.shaderNuevo
 
 # Cargamos los modelos que renderizaremos
-rend.glLoadModel(filename="models/model.obj",
-                 textureName="textures/model.bmp",
-                 translate=(0, 0, -5),
+rend.glLoadModel(filename="models/calamardo.obj",
+                 textureName="textures/albedo.bmp",
+                 translate=(0, 1, -7),
                  rotate=(0, 0, 0),
                  scale=(1.5,1.5, 1.5))
 
@@ -25,7 +25,7 @@ rend.glLoadModel(filename="models/model.obj",
 rend.glRender()
 
 # Se crea el FrameBuffer con la escena renderizada
-rend.glFinish("pixelationShader.bmp")
+rend.glFinish("shaderNuevo.bmp")
 
 
 

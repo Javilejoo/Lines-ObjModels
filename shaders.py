@@ -47,6 +47,60 @@ def fragmentShader(**kwargs):
 
     return color
 
+def blinnPhongShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+
+    b = 1.0
+    g = 1.0
+    r = 1.0
+
+    if texture is not None:
+        tU = u * tA[0] + v * tB[0] + w * tC[0]
+        tV = u * tA[1] + v * tB[1] + w * tC[1]
+        textureColor = texture.getColor(tU, tV)
+        b *= textureColor[2]
+        g *= textureColor[1]
+        r *= textureColor[0]
+
+    normal = [
+        u * nA[0] + v * nB[0] + w * nC[0],
+        u * nA[1] + v * nB[1] + w * nC[1],
+        u * nA[2] + v * nB[2] + w * nC[2]
+    ]
+
+    # Calcular la intesidad de la luz
+    intensity = normal[0] * -dLight[0] + normal[1] * -dLight[1] + normal[2] * -dLight[2]
+    intensity = max(intensity, 0)  
+
+    # calcular la direccion de angulo
+    viewDir = [0, 0, -1]  
+    viewDir_len = (viewDir[0]**2 + viewDir[1]**2 + viewDir[2]**2)**0.5
+    viewDir = [viewDir[0] / viewDir_len, viewDir[1] / viewDir_len, viewDir[2] / viewDir_len]
+
+    # calcular la mitad del vector
+    halfVec = [
+        viewDir[0] + (-dLight[0]),
+        viewDir[1] + (-dLight[1]),
+        viewDir[2] + (-dLight[2])
+    ]
+    halfVec_len = (halfVec[0]**2 + halfVec[1]**2 + halfVec[2]**2)**0.5
+    halfVec = [halfVec[0] / halfVec_len, halfVec[1] / halfVec_len, halfVec[2] / halfVec_len]
+
+    # calcular el spcereclect
+    specReflect = max(0, (normal[0] * halfVec[0] + normal[1] * halfVec[1] + normal[2] * halfVec[2])**16)
+
+    # modificar la reflexion
+    r *= intensity + specReflect
+    g *= intensity + specReflect
+    b *= intensity + specReflect
+
+    return r, g, b
+
+
 def flatShader(**kwargs):
     texCoords = kwargs["texCoords"]
     texture = kwargs["texture"]
@@ -120,24 +174,29 @@ def gouradShader(**kwargs):
     else:
         return [0,0,0]
 
-def shaderNuevo(**kwargs):
-    
-    texCoords = kwargs["texCoords"]
+
+
+def mosaicShader(**kwargs):
     texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
     dLight = kwargs["dLight"]
-    normal = kwargs["triangleNormal"]
+    u, v, w = kwargs["bCoords"]
 
-    b = 1.0
-    g = 1.0
-    r = 1.0
+    # Definir el tamaño del mosaico
+    mosaic_size = 20  # Tamaño de cada celda del mosaico
 
-    # Obtener las coordenadas de textura
-    u, v = texCoords
+    # Calcular las coordenadas de la celda actual
+    cell_u = int(u * mosaic_size) / mosaic_size
+    cell_v = int(v * mosaic_size) / mosaic_size
 
-    # Modificar colores basados en las coordenadas de textura
-    r *= u
-    g *= v
-    b *= (u + v) / 2
+    # Calcular los colores basados en las coordenadas de la celda
+    r = cell_u
+    g = cell_v
+    b = (cell_u + cell_v) / 2
+    normal = [u * nA[0] + v * nB[0] + w * nC[0],
+              u * nA[1] + v * nB[1] + w * nC[1],
+              u * nA[2] + v * nB[2] + w * nC[2]]
 
     # Calcular intensidad de la luz
     dLight = np.array(dLight)
@@ -152,8 +211,9 @@ def shaderNuevo(**kwargs):
         return r, g, b
     else:
         return [0, 0, 0]
-    
-def gouradShaderVCV(**kwargs):
+
+
+def shaderNuevo(**kwargs):
     texture = kwargs["texture"]
     tA, tB, tC = kwargs["texCoords"]
     nA, nB, nC = kwargs["normals"]
@@ -164,76 +224,37 @@ def gouradShaderVCV(**kwargs):
     g = 1.0
     r = 1.0
 
-    if texture != None:
-        tU = u * tA[0] + v * tB[0] + w * tC[0] 
+    if texture is not None:
+        tU = u * tA[0] + v * tB[0] + w * tC[0]
         tV = u * tA[1] + v * tB[1] + w * tC[1]
-        texureColor = texture.getColor(tU, tV)
-        b *= texureColor[2]
-        g *= texureColor[1]
-        r *= texureColor[0]
+        textureColor = texture.getColor(tU, tV)
+        b *= textureColor[2]
+        g *= textureColor[1]
+        r *= textureColor[0]
+
+    # Crear gradiantes en base a las baricentricas
+    gradient_factor = u + v  
+
+    # colores gradiantrs
+    r *= gradient_factor
+    g *= gradient_factor
+    b *= gradient_factor
 
     normal = [u * nA[0] + v * nB[0] + w * nC[0],
               u * nA[1] + v * nB[1] + w * nC[1],
               u * nA[2] + v * nB[2] + w * nC[2]]
 
-    dLight = np.array(dLight)
-    intensity = np.dot(normal, -dLight)
+    # intensidad de la luz
+    intensity = normal[0] * -dLight[0] + normal[1] * -dLight[1] + normal[2] * -dLight[2]
 
-    b *= intensity
-    g *= intensity
+    # Modificar la intensidad
     r *= intensity
+    g *= intensity
+    b *= intensity
 
     if intensity > 0:
-        # Agregar un toque de color aleatorio en los vértices
-        color_variation = random.uniform(0.8, 1.2)
-        r *= color_variation
-        g *= color_variation
-        b *= color_variation
-        
-        # Añadir un toque de color azul a los bordes
-        edge_threshold = 0.8
-        if intensity < edge_threshold:
-            b += (1 - intensity) * 0.5
-
-        # Añadir un toque de color amarillo en los puntos de mayor intensidad
-        highlight_threshold = 0.95
-        if intensity > highlight_threshold:
-            r += (intensity - highlight_threshold) * 0.5
-            g += (intensity - highlight_threshold) * 0.5
-
         return r, g, b
     else:
         return [0, 0, 0]
-    
 
-def pixelationShader(**kwargs):
-    texture = kwargs["texture"]
-    tA, tB, tC = kwargs["texCoords"]
 
-    pixel_size = 10  # Tamaño de los píxeles
-
-    b = 1.0
-    g = 1.0
-    r = 1.0
-
-    if texture is not None:
-        tU = (tA[0] + tB[0] + tC[0]) / 3.0  # Usamos el promedio de las coordenadas
-        tV = (tA[1] + tB[1] + tC[1]) / 3.0  # Usamos el promedio de las coordenadas
-        textureColor = texture.getColor(tU, tV)
-        if textureColor is not None:
-            b *= textureColor[2]
-            g *= textureColor[1]
-            r *= textureColor[0]
-
-    # Redondeamos las coordenadas UV para crear el efecto de pixelación
-    tU = round(tU * pixel_size) / pixel_size
-    tV = round(tV * pixel_size) / pixel_size
-
-    if texture is not None:
-        textureColor = texture.getColor(tU, tV)
-        if textureColor is not None:
-            b *= textureColor[2]
-            g *= textureColor[1]
-            r *= textureColor[0]
-
-    return r, g, b

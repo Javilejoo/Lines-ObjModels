@@ -6,6 +6,7 @@ from texture import Texture
 from mathLib import *
 
 
+
 POINTS = 0
 LINES = 1
 TRIANGLES = 2
@@ -137,8 +138,8 @@ class Renderer(object):
                                                              texCoords = texCoords,
                                                              normals = normals,
                                                              dLight = self.directionalLight ,
-                                                             bCoords = bCoords                                             
-                                    
+                                                             bCoords = bCoords,
+                                                             
                                                                
                                                             # triangleNormal = triangleNormal,
                                                              )
