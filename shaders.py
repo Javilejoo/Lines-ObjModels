@@ -105,7 +105,7 @@ def flatShader(**kwargs):
     texCoords = kwargs["texCoords"]
     texture = kwargs["texture"]
     dLight = kwargs["dLight"]
-    normal = kwargs["triangleNormal"]
+    normal = kwargs["normals"]
 
     b = 1.0
     g = 1.0
