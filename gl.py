@@ -19,6 +19,7 @@ class Model(object):
         
         model = Obj(filename)
 
+        self.name = filename
         self.vertices = model.vertices
         self.texcoords = model.texcoords
         self.normals = model.normals
@@ -59,7 +60,10 @@ class Renderer(object):
         self.glCamMatrix()
         self.glProjectionMatrix()
 
-        self.directionalLight = (1,0,0)
+        self.directionalLight = (-1,0,-1)
+
+    def glDirectionLight(self,x,y,z):
+        self.directionalLight = (x,y,z)
 
     def glBackgroundTexture(self, filename):
         self.background = Texture(filename)
@@ -247,7 +251,7 @@ class Renderer(object):
         self.viewMatrix = matriz_inversa(self.camMatrix)
 
 
-    def glProjectionMatrix(self, fov = 60, n = 0.1, f = 1000):
+    def glProjectionMatrix(self, fov = 39.59, n = 0.1, f = 1000):
         aspectRatio = self.vpWidth / self.vpHeight
 
         t = tan( (fov * pi/180) / 2) * n
@@ -392,6 +396,7 @@ class Renderer(object):
 
         # Para cada modelo en nuestro listado de objetos
         for model in self.objects:
+            print(model.name)
 
             # Establecemos la textura y la matriz del modelo
             self.activeTexture = model.texture

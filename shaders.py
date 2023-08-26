@@ -47,6 +47,9 @@ def fragmentShader(**kwargs):
 
     return color
 
+def normalize_color(color):
+    return [max(0, min(1, channel)) for channel in color]
+
 def blinnPhongShader(**kwargs):
     texture = kwargs["texture"]
     tA, tB, tC = kwargs["texCoords"]
@@ -168,6 +171,7 @@ def gouradShader(**kwargs):
     b *= intensity
     g *= intensity
     r *= intensity
+    r, g, b = normalize_color([r, g, b])
 
     if intensity > 0:
         return r, g,b
@@ -251,6 +255,7 @@ def shaderNuevo(**kwargs):
     r *= intensity
     g *= intensity
     b *= intensity
+    r, g, b = normalize_color([r, g, b])
 
     if intensity > 0:
         return r, g, b
