@@ -17,7 +17,7 @@ rend.glLookAt(camPos=(0,0,0),eyePos=(0,0,-1))
 rend.glBackgroundTexture("textures/fondoOnePiece.bmp")
 rend.glClearBackground()
 
-#Thousand Sunny
+ #Thousand Sunny
 # Le damos los shaders que se utilizarán
 rend.glDirectionLight(0,0,-1)
 rend.vertexShader = shaders.vertexShader
@@ -42,17 +42,9 @@ rend.glLoadModel(filename="models/GoingMerry.obj",
                  rotate=(0, 0, 0),
                  scale=(1,1, 1))
 rend.glRender() 
+"""
 rend.glDirectionLight(0,0,-0.5)
 
-#Pokeball
-rend.vertexShader = shaders.vertexShader
-rend.fragmentShader = shaders.pixelArtShader
-rend.glLoadModel(filename = "models/pokebola.obj",
-                 textureName="textures/pokeball.bmp",
-                 translate=(0,0,0),
-                 rotate=(0,0,0),
-                 scale=(1,1,1))
-rend.glRender()  
 
  #Luffy
 rend.glDirectionLight(0,0,-1)
@@ -72,7 +64,29 @@ rend.glLoadModel(filename = "models/zoro.obj",
                  translate=(0,0,0),
                  rotate=(0,0,0),
                  scale=(1,1,1))
-rend.glRender() 
+rend.glRender()  """
+#Pokeball
+# # Le damos los shaders que se utilizarán
+rend.vertexShader = shaders.vertexShader
+rend.fragmentShader = shaders.pixelArtShader
+# Cargamos los modelos que renderizaremos
+rend.glLoadModel(filename = "models/pokebola.obj",
+                 textureName="textures/pokeball.bmp",
+                 translate=(0,0,0),
+                 rotate=(0,0,0),
+                 scale=(1,1,1))
+rend.glRender()  
+
+#Goku
+rend.vertexShader = shaders.vertexShader
+rend.fragmentShader = shaders.gokuShader
+# Cargamos los modelos que renderizaremos
+rend.glLoadModel(filename = "models/goku.obj",
+                 textureName="textures/DBOkidgoku2.bmp",
+                 translate=(0,0,0),
+                 rotate=(0,0,0),
+                 scale=(1,1,1))
+rend.glRender()
 
 # Se crea el FrameBuffer con la escena renderizada
 rend.glFinish("Onepiece.bmp")

@@ -348,7 +348,8 @@ def metallicShader(**kwargs):
     else:
         return [0, 0, 0]
 
-def lightingShader(**kwargs):
+
+def gokuShader(**kwargs):
     texture = kwargs["texture"]
     tA, tB, tC = kwargs["texCoords"]
     nA, nB, nC = kwargs["normals"]
@@ -367,18 +368,25 @@ def lightingShader(**kwargs):
         g *= textureColor[1]
         r *= textureColor[0]
 
-    normal = [u * nA[0] + v * nB[0] + w * nC[0],
-              u * nA[1] + v * nB[1] + w * nC[1],
-              u * nA[2] + v * nB[2] + w * nC[2]]
+    normal = [
+        u * nA[0] + v * nB[0] + w * nC[0],
+        u * nA[1] + v * nB[1] + w * nC[1],
+        u * nA[2] + v * nB[2] + w * nC[2]
+    ]
 
-    # Calcular la intensidad de la luz basada en el modelo de Lambert
-    intensity = max(0, normal[0] * -dLight[0] + normal[1] * -dLight[1] + normal[2] * -dLight[2])
+    # Calcular la intensidad de la luz
+    intensity = dot_product(normal, [-dLight[0], -dLight[1], -dLight[2]])
+    intensity = max(intensity, 0)
 
-    # Aplicar intensidad de luz al color
-    r *= intensity
-    g *= intensity
-    b *= intensity
+    # Ajustar los colores para dar un aspecto de estilo Goku
+    r *= 1.5  # Aumentar el componente rojo
+    g *= 1.2  # Aumentar el componente verde
+    b *= 0.8  # Disminuir el componente azul
+
     r, g, b = normalize_color([r, g, b])
 
-    return r, g, b
+    if intensity > 0:
+        return r, g, b
+    else:
+        return [0, 0, 0]
 
