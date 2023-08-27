@@ -14,7 +14,7 @@ height = 540
 rend = Renderer(width, height)
 rend.glLookAt(camPos=(0,0,0),eyePos=(0,0,-1))
 
-rend.glBackgroundTexture("textures/fondoOnePiece.bmp")
+rend.glBackgroundTexture("textures/fondoDragonBall.bmp")
 rend.glClearBackground()
 
  #Thousand Sunny
@@ -25,7 +25,7 @@ rend.fragmentShader = shaders.metallicShader
 # Cargamos los modelos que renderizaremos
 rend.glLoadModel(filename="models/ThousandSunny.obj",
                  textureName="textures/tex.bmp",
-                 translate=(0, 0, 0),
+                 translate=(0, 0, 1),
                  rotate=(0, 0, 0),
                  scale=(1,1, 1)) 
 rend.glRender()  
@@ -42,29 +42,7 @@ rend.glLoadModel(filename="models/GoingMerry.obj",
                  rotate=(0, 0, 0),
                  scale=(1,1, 1))
 rend.glRender() 
-"""
-rend.glDirectionLight(0,0,-0.5)
 
-
- #Luffy
-rend.glDirectionLight(0,0,-1)
-rend.vertexShader = shaders.vertexShader
-rend.fragmentShader = shaders.shaderNuevo
-rend.glLoadModel(filename = "models/luffy.obj",
-                 textureName="textures/Luffy1.bmp",
-                 translate=(0,0,0),
-                 rotate=(0,0,0),
-                 scale=(1,1,1))
-rend.glRender() 
-
-rend.vertexShader = shaders.vertexShader
-rend.fragmentShader = shaders.shaderNuevo
-rend.glLoadModel(filename = "models/zoro.obj",
-                 textureName="textures/ZoroTex.bmp",
-                 translate=(0,0,0),
-                 rotate=(0,0,0),
-                 scale=(1,1,1))
-rend.glRender()  """
 #Pokeball
 # # Le damos los shaders que se utilizarán
 rend.vertexShader = shaders.vertexShader
@@ -72,7 +50,7 @@ rend.fragmentShader = shaders.pixelArtShader
 # Cargamos los modelos que renderizaremos
 rend.glLoadModel(filename = "models/pokebola.obj",
                  textureName="textures/pokeball.bmp",
-                 translate=(0,0,0),
+                 translate=(-2,2,0),
                  rotate=(0,0,0),
                  scale=(1,1,1))
 rend.glRender()  
@@ -83,13 +61,27 @@ rend.fragmentShader = shaders.gokuShader
 # Cargamos los modelos que renderizaremos
 rend.glLoadModel(filename = "models/goku.obj",
                  textureName="textures/DBOkidgoku2.bmp",
+                 translate=(-2,2,0),
+                 rotate=(0,0,0),
+                 scale=(1,1,1))
+rend.glRender()
+
+rend.glDirectionLight(0,0,1)
+#Squirtle
+rend.vertexShader = shaders.vertexShader
+rend.fragmentShader = shaders.squirtleShader
+# Cargamos los modelos que renderizaremos
+rend.glLoadModel(filename = "models/squirtlepie.obj",
+                 textureName="textures/Squirtle_base.bmp",
                  translate=(0,0,0),
                  rotate=(0,0,0),
                  scale=(1,1,1))
 rend.glRender()
 
+
+
 # Se crea el FrameBuffer con la escena renderizada
-rend.glFinish("Onepiece.bmp")
+rend.glFinish("OnePieceXDragonBallXPokemon.bmp")
 
 end_time = time.time()
 print(f"Execution took {end_time - start_time:.2f} seconds to run.")

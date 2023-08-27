@@ -246,7 +246,7 @@ def pixelArtShader(**kwargs):
     # Calcula la intensidad de la luz
     intensity = normal[0] * -dLight[0] + normal[1] * -dLight[1] + normal[2] * -dLight[2]
 
-    # Aplica el efecto de estilo de juegos de píxeles
+    # Aplica el efecto 
     color_steps = 4  # Número de pasos de color
     r = round(r * color_steps) / color_steps
     g = round(g * color_steps) / color_steps
@@ -330,13 +330,13 @@ def metallicShader(**kwargs):
     # Calcula la intensidad de la luz
     intensity = dot_product(normal, [-dLight[0], -dLight[1], -dLight[2]])
 
-    # Aplica efectos de un material metálico
+
     fresnel = math.pow((1 - intensity), 5)  # Efecto de Fresnel
     halfway_dir = division_vector_escalar([0, 0, -1], normalizar([-dLight[0], -dLight[1], -dLight[2]]))
-    specular = math.pow(max(dot_product(normal, halfway_dir), 0), 16)  # Término especular
+    specular = math.pow(max(dot_product(normal, halfway_dir), 0), 16)  # Termino especular
 
     # Mezcla el color base con el color especular
-    metallic = 0.2  # Ajusta el valor de metalicidad
+    metallic = 0.2  
     r = (1 - metallic) * r + metallic * (specular + fresnel)
     g = (1 - metallic) * g + metallic * (specular + fresnel)
     b = (1 - metallic) * b + metallic * (specular + fresnel)
@@ -378,7 +378,7 @@ def gokuShader(**kwargs):
     intensity = dot_product(normal, [-dLight[0], -dLight[1], -dLight[2]])
     intensity = max(intensity, 0)
 
-    # Ajustar los colores para dar un aspecto de estilo Goku
+    # Ajustar los colores 
     r *= 1.5  # Aumentar el componente rojo
     g *= 1.2  # Aumentar el componente verde
     b *= 0.8  # Disminuir el componente azul
@@ -390,3 +390,43 @@ def gokuShader(**kwargs):
     else:
         return [0, 0, 0]
 
+def squirtleShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+
+    b = 1.0
+    g = 1.0
+    r = 1.0
+
+    if texture is not None:
+        tU = u * tA[0] + v * tB[0] + w * tC[0]
+        tV = u * tA[1] + v * tB[1] + w * tC[1]
+        textureColor = texture.getColor(tU, tV)
+        b *= textureColor[2]
+        g *= textureColor[1]
+        r *= textureColor[0]
+
+    normal = [
+        u * nA[0] + v * nB[0] + w * nC[0],
+        u * nA[1] + v * nB[1] + w * nC[1],
+        u * nA[2] + v * nB[2] + w * nC[2]
+    ]
+
+    # Calcular la intensidad de la luz
+    intensity = dot_product(normal, [-dLight[0], -dLight[1], -dLight[2]])
+    intensity = max(intensity, 0)
+
+    # Ajustar los colores 
+    r *= 0.7  # Disminuir el componente rojo
+    g *= 0.9  # Disminuir ligeramente el componente verde
+    b *= 1.3  # Aumentar el componente azul
+
+    r, g, b = normalize_color([r, g, b])
+
+    if intensity > 0:
+        return r, g, b
+    else:
+        return [0, 0, 0]
