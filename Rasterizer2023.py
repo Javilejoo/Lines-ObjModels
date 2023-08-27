@@ -17,27 +17,24 @@ rend.glLookAt(camPos=(0,0,0),eyePos=(0,0,-1))
 rend.glBackgroundTexture("textures/fondoOnePiece.bmp")
 rend.glClearBackground()
 
-# GOING MERRY
-# Le damos los shaders que se utilizarán
-rend.vertexShader = shaders.vertexShader
-rend.fragmentShader = shaders.shaderNuevo
-
-rend.glDirectionLight(-1,0,-1)
-
 #Thousand Sunny
 # Le damos los shaders que se utilizarán
+rend.glDirectionLight(0,0,-1)
 rend.vertexShader = shaders.vertexShader
-rend.fragmentShader = shaders.gouradShader
+rend.fragmentShader = shaders.metallicShader
 # Cargamos los modelos que renderizaremos
 rend.glLoadModel(filename="models/ThousandSunny.obj",
                  textureName="textures/tex.bmp",
                  translate=(0, 0, 0),
                  rotate=(0, 0, 0),
                  scale=(1,1, 1)) 
-rend.glRender() 
+rend.glRender()  
 
-
-rend.glDirectionLight(0,0,-1)
+# GOING MERRY
+# Le damos los shaders que se utilizarán
+rend.glDirectionLight(0,0,-0.9)
+rend.vertexShader = shaders.vertexShader
+rend.fragmentShader = shaders.blinnPhongShader
 # Cargamos los modelos que renderizaremos
 rend.glLoadModel(filename="models/GoingMerry.obj",
                  textureName="textures/Onepiece.bmp",
@@ -45,10 +42,11 @@ rend.glLoadModel(filename="models/GoingMerry.obj",
                  rotate=(0, 0, 0),
                  scale=(1,1, 1))
 rend.glRender() 
+rend.glDirectionLight(0,0,-0.5)
 
 #Pokeball
 rend.vertexShader = shaders.vertexShader
-rend.fragmentShader = shaders.shaderNuevo
+rend.fragmentShader = shaders.pixelArtShader
 rend.glLoadModel(filename = "models/pokebola.obj",
                  textureName="textures/pokeball.bmp",
                  translate=(0,0,0),
@@ -57,6 +55,7 @@ rend.glLoadModel(filename = "models/pokebola.obj",
 rend.glRender()  
 
  #Luffy
+rend.glDirectionLight(0,0,-1)
 rend.vertexShader = shaders.vertexShader
 rend.fragmentShader = shaders.shaderNuevo
 rend.glLoadModel(filename = "models/luffy.obj",
@@ -74,9 +73,6 @@ rend.glLoadModel(filename = "models/zoro.obj",
                  rotate=(0,0,0),
                  scale=(1,1,1))
 rend.glRender() 
-
-
-
 
 # Se crea el FrameBuffer con la escena renderizada
 rend.glFinish("Onepiece.bmp")

@@ -1,6 +1,4 @@
-import random
 from mathLib import *
-import numpy as np
 
 
 def vertexShader(vertex, **kwargs):
@@ -38,11 +36,13 @@ def fragmentShader(**kwargs):
 
     texCoords = kwargs["texCoords"]
     texture = kwargs["texture"]
+    
 
     if texture != None:
         color = texture.getColor(texCoords[0], texCoords[1])
     else:
         color = (1,1,1)
+    
 
 
     return color
@@ -60,6 +60,7 @@ def blinnPhongShader(**kwargs):
     b = 1.0
     g = 1.0
     r = 1.0
+    
 
     if texture is not None:
         tU = u * tA[0] + v * tB[0] + w * tC[0]
@@ -100,6 +101,9 @@ def blinnPhongShader(**kwargs):
     r *= intensity + specReflect
     g *= intensity + specReflect
     b *= intensity + specReflect
+    r, g, b = normalize_color([r, g, b])
+
+
 
     return r, g, b
 
@@ -114,34 +118,33 @@ def flatShader(**kwargs):
     g = 1.0
     r = 1.0
 
-    color = [1,1,1]
+    color = [1, 1, 1]
 
-    if texture != None:
-        texureColor = texture.getColor(texCoords[0], texCoords[1])
-        b *= texureColor[2]
-        g *= texureColor[1]
-        r *= texureColor[0]
-    
-    
-    dLight = np.array(dLight)
-    intensity = np.dot(normal, -dLight)
+    if texture is not None:
+        tU = texCoords[0]
+        tV = texCoords[1]
+        textureColor = texture.getColor(tU, tV)
+        b *= textureColor[2]
+        g *= textureColor[1]
+        r *= textureColor[0]
 
-   
+    intensity = dot_product(normal, [-dLight[0], -dLight[1], -dLight[2]])
+
     b *= intensity
     g *= intensity
     r *= intensity
-    
- 
 
     if intensity > 0:
-        return r,g,b
+        return r, g, b
     else:
-        return [0,0,0]
+        return [0, 0, 0]
+
+
 
 def gouradShader(**kwargs):
     texture = kwargs["texture"]
     tA, tB, tC = kwargs["texCoords"]
-    nA, nB,nC = kwargs["normals"]
+    nA, nB, nC = kwargs["normals"]
     dLight = kwargs["dLight"]
     u, v, w = kwargs["bCoords"]
 
@@ -149,34 +152,32 @@ def gouradShader(**kwargs):
     g = 1.0
     r = 1.0
 
-    if texture != None:
-
-        tU = u * tA[0] + v * tB[0] + w * tC[0] 
+    if texture is not None:
+        tU = u * tA[0] + v * tB[0] + w * tC[0]
         tV = u * tA[1] + v * tB[1] + w * tC[1]
-  
-        texureColor = texture.getColor(tU, tV)
-        b *= texureColor[2]
-        g *= texureColor[1]
-        r *= texureColor[0]
+        textureColor = texture.getColor(tU, tV)
+        b *= textureColor[2]
+        g *= textureColor[1]
+        r *= textureColor[0]
 
-    normal = [u * nA[0] + v * nB[0] + w * nC[0],
-            u * nA[1] + v * nB[1] + w * nC[1],
-            u * nA[2] + v * nB[2] + w * nC[2]]
-    
-    dLight = np.array(dLight)
-    intensity = np.dot(normal, -dLight)
+    normal = [
+        u * nA[0] + v * nB[0] + w * nC[0],
+        u * nA[1] + v * nB[1] + w * nC[1],
+        u * nA[2] + v * nB[2] + w * nC[2]
+    ]
 
+    intensity = dot_product(normal, [-dLight[0], -dLight[1], -dLight[2]])
 
-   
     b *= intensity
     g *= intensity
     r *= intensity
+
     r, g, b = normalize_color([r, g, b])
 
     if intensity > 0:
-        return r, g,b
+        return r, g, b
     else:
-        return [0,0,0]
+        return [0, 0, 0]
 
 
 
@@ -198,18 +199,20 @@ def mosaicShader(**kwargs):
     r = cell_u
     g = cell_v
     b = (cell_u + cell_v) / 2
-    normal = [u * nA[0] + v * nB[0] + w * nC[0],
-              u * nA[1] + v * nB[1] + w * nC[1],
-              u * nA[2] + v * nB[2] + w * nC[2]]
+    normal = [
+        u * nA[0] + v * nB[0] + w * nC[0],
+        u * nA[1] + v * nB[1] + w * nC[1],
+        u * nA[2] + v * nB[2] + w * nC[2]
+    ]
 
     # Calcular intensidad de la luz
-    dLight = np.array(dLight)
-    intensity = np.dot(normal, -dLight)
+    intensity = dot_product(normal, [-dLight[0], -dLight[1], -dLight[2]])
 
     # Aplicar intensidad de luz a los colores
     r *= intensity
     g *= intensity
     b *= intensity
+    r, g, b = normalize_color([r, g, b])
 
     if intensity > 0:
         return r, g, b
@@ -217,6 +220,45 @@ def mosaicShader(**kwargs):
         return [0, 0, 0]
 
 
+def pixelArtShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+
+    b = 1.0
+    g = 1.0
+    r = 1.0
+
+    if texture is not None:
+        tU = u * tA[0] + v * tB[0] + w * tC[0]
+        tV = u * tA[1] + v * tB[1] + w * tC[1]
+        textureColor = texture.getColor(tU, tV)
+        b *= textureColor[2]
+        g *= textureColor[1]
+        r *= textureColor[0]
+
+    normal = [u * nA[0] + v * nB[0] + w * nC[0],
+              u * nA[1] + v * nB[1] + w * nC[1],
+              u * nA[2] + v * nB[2] + w * nC[2]]
+
+    # Calcula la intensidad de la luz
+    intensity = normal[0] * -dLight[0] + normal[1] * -dLight[1] + normal[2] * -dLight[2]
+
+    # Aplica el efecto de estilo de juegos de píxeles
+    color_steps = 4  # Número de pasos de color
+    r = round(r * color_steps) / color_steps
+    g = round(g * color_steps) / color_steps
+    b = round(b * color_steps) / color_steps
+
+    r, g, b = normalize_color([r, g, b])
+
+    if intensity > 0:
+        return r, g, b
+    else:
+        return [0, 0, 0]
+   
 def shaderNuevo(**kwargs):
     texture = kwargs["texture"]
     tA, tB, tC = kwargs["texCoords"]
@@ -262,4 +304,81 @@ def shaderNuevo(**kwargs):
     else:
         return [0, 0, 0]
 
+def metallicShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+
+    b = 1.0
+    g = 1.0
+    r = 1.0
+
+    if texture is not None:
+        tU = u * tA[0] + v * tB[0] + w * tC[0]
+        tV = u * tA[1] + v * tB[1] + w * tC[1]
+        textureColor = texture.getColor(tU, tV)
+        b *= textureColor[2]
+        g *= textureColor[1]
+        r *= textureColor[0]
+
+    normal = [u * nA[0] + v * nB[0] + w * nC[0],
+              u * nA[1] + v * nB[1] + w * nC[1],
+              u * nA[2] + v * nB[2] + w * nC[2]]
+
+    # Calcula la intensidad de la luz
+    intensity = dot_product(normal, [-dLight[0], -dLight[1], -dLight[2]])
+
+    # Aplica efectos de un material metálico
+    fresnel = math.pow((1 - intensity), 5)  # Efecto de Fresnel
+    halfway_dir = division_vector_escalar([0, 0, -1], normalizar([-dLight[0], -dLight[1], -dLight[2]]))
+    specular = math.pow(max(dot_product(normal, halfway_dir), 0), 16)  # Término especular
+
+    # Mezcla el color base con el color especular
+    metallic = 0.2  # Ajusta el valor de metalicidad
+    r = (1 - metallic) * r + metallic * (specular + fresnel)
+    g = (1 - metallic) * g + metallic * (specular + fresnel)
+    b = (1 - metallic) * b + metallic * (specular + fresnel)
+
+    r, g, b = normalize_color([r, g, b])
+
+    if intensity > 0:
+        return r, g, b
+    else:
+        return [0, 0, 0]
+
+def lightingShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+
+    b = 1.0
+    g = 1.0
+    r = 1.0
+
+    if texture is not None:
+        tU = u * tA[0] + v * tB[0] + w * tC[0]
+        tV = u * tA[1] + v * tB[1] + w * tC[1]
+        textureColor = texture.getColor(tU, tV)
+        b *= textureColor[2]
+        g *= textureColor[1]
+        r *= textureColor[0]
+
+    normal = [u * nA[0] + v * nB[0] + w * nC[0],
+              u * nA[1] + v * nB[1] + w * nC[1],
+              u * nA[2] + v * nB[2] + w * nC[2]]
+
+    # Calcular la intensidad de la luz basada en el modelo de Lambert
+    intensity = max(0, normal[0] * -dLight[0] + normal[1] * -dLight[1] + normal[2] * -dLight[2])
+
+    # Aplicar intensidad de luz al color
+    r *= intensity
+    g *= intensity
+    b *= intensity
+    r, g, b = normalize_color([r, g, b])
+
+    return r, g, b
 

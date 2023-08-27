@@ -3,7 +3,7 @@ import struct
 class Texture(object):
     def __init__(self, filename):
         with open(filename, "rb") as image:
-            # Se carga la información de la imagen, asumiendo
+            # Se carga la informaciï¿½n de la imagen, asumiendo
             # que tiene un formato BMP de 24 bits.
             image.seek(10)
             headerSize = struct.unpack('=l', image.read(4))[0]
@@ -30,7 +30,7 @@ class Texture(object):
 
     def getColor(self, u, v):
         # Se regresa el valor del pixel si los valores de las uv
-        # están entre 0 y 1.
+        # estï¿½n entre 0 y 1.
         if 0<=u<1 and 0<=v<1:
             return self.pixels[int(v * self.height)][int(u * self.width)]
         else:

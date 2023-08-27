@@ -1,4 +1,3 @@
-import numpy as np
 from math import pi, sin, cos, tan
 from support import *
 from obj import Obj
